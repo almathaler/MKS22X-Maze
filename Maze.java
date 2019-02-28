@@ -7,14 +7,25 @@ public class Maze{
     //private int[][] startLocation; //i will set this in constructor, hope it's fine
     public static void main(String[] args){
       try{
+        makeRandomMazeFile(args[0]);
         Maze example = new Maze(args[0]);
         System.out.println(example);
-        example.setAnimate(true);
+      }catch (FileNotFoundException e){
+        System.out.println("file not found");
+      }catch (UnsupportedEncodingException e){
+        System.out.println("UTF-8 not there");
+      }
+      /*
+      try{
+        Maze example = new Maze(args[0]);
+        System.out.println(example);
+        example.setAnimate(Boolean.parseBoolean(args[1]));
         System.out.println(example.solve());
 
       }catch (FileNotFoundException e){
         System.out.println("That file doesn't exist!");
       }
+      */
     }
     /*Constructor loads a maze text file, and sets animate to false by default.
 
@@ -50,7 +61,7 @@ public class Maze{
         int countS = 0;
         while (inf.hasNextLine()){
           String toAdd = inf.nextLine();
-          if (!toAdd.equals("") && !toAdd.equals("\n")){
+          if (!toAdd.equals("") && !toAdd.equals("\n") && !toAdd.equals(" ") && !toAdd.equals("\t")){
             char[] curArray = toAdd.toCharArray();
             for (char i : curArray){
               //System.out.println("testing [" + i + "] for E or S");
@@ -68,6 +79,38 @@ public class Maze{
         if (countE != 1 || countS != 1){
           throw new IllegalStateException("Inappropriate amount of E and S!");
         }
+    }
+    public static void makeRandomMazeFile(String filename) throws FileNotFoundException, UnsupportedEncodingException{ //throws a filenot found if the input filename can't be created, like if it's file.abcdefg
+      //first make the Maze
+      Random rnd = new Random();
+      int rows = rnd.nextInt(30) + 5;
+      int cols = rnd.nextInt(30) + 5; //want at least 5 rows
+      int ePosR = rnd.nextInt(rows); //row of e
+      int ePosC = rnd.nextInt(cols); //col
+      int sPosR = rnd.nextInt(rows);
+      if (sPosR == ePosR){
+        sPosR = (sPosR + sPosR/2) % rows;
+      }
+      int sPosC = rnd.nextInt(cols);
+      if (sPosC == ePosC){
+        sPosC = (sPosC + sPosC/2) % cols;
+      }
+      char[][] maze = new char[rows][cols];
+      for (int i = 0; i<maze.length; i++){
+        for (int k = 0; k<maze[0].length; k++){
+          maze[i][k] = '#';
+        }
+      }
+      maze[ePosR][ePosC] = 'E';
+      maze[sPosR][sPosC] = 'S';
+      //then write out to a file specified by user
+      PrintWriter writer = new PrintWriter(filename, "UTF-8");
+      for (int r = 0; r<maze.length; r++){
+        String toWrite = new String(maze[r]);
+        writer.println(toWrite);
+      }
+      writer.close();
+
     }
 
     private void wait(int millis){
@@ -143,7 +186,7 @@ public class Maze{
         if(animate){
             clearTerminal();
             System.out.println(this);
-            wait(200);
+            wait(140);
         }
         //COMPLETE SOLVE
         if (maze[row][col] == 'E'){ //if you're at the end
