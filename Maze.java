@@ -1,13 +1,17 @@
 import java.util.*;
 import java.io.*;
 public class Maze{
-
+    private int[][] moves = {{-1, 0}, {1, 0}, {0, 1}, {0,-1}};
     private char[][] maze;
     private boolean animate;//false by default
+    //private int[][] startLocation; //i will set this in constructor, hope it's fine
     public static void main(String[] args){
       try{
         Maze example = new Maze(args[0]);
         System.out.println(example);
+        example.setAnimate(true);
+        System.out.println(example.solve());
+
       }catch (FileNotFoundException e){
         System.out.println("That file doesn't exist!");
       }
@@ -49,7 +53,7 @@ public class Maze{
           if (!toAdd.equals("") && !toAdd.equals("\n")){
             char[] curArray = toAdd.toCharArray();
             for (char i : curArray){
-              System.out.println("testing [" + i + "] for E or S");
+              //System.out.println("testing [" + i + "] for E or S");
               if (i == 'E'){
                 countE++;
               }
@@ -108,11 +112,17 @@ public class Maze{
     */
     public int solve(){
             //find the location of the S.
-            return -1;
             //erase the S
-
             //and start solving at the location of the s.
+            for (int r = 0; r<maze.length; r++){
+              for (int c = 0; c<maze[0].length; c++){
+                if (maze[r][c] == 'S'){
+                  return solve(r, c, 0);
+                }
+              }
+            }
             //return solve(???,???);
+            return -1; //should never get here, if there is no S but constructor takes care of that.
     }
 
     /*
@@ -128,17 +138,35 @@ public class Maze{
         All visited spots that were not part of the solution are changed to '.'
         All visited spots that are part of the solution are changed to '@'
     */
-    private int solve(int row, int col){ //you can add more parameters since this is private
-
+    private int solve(int row, int col, int numAts){ //you can add more parameters since this is private
         //automatic animation! You are welcome.
         if(animate){
             clearTerminal();
             System.out.println(this);
-            wait(20);
+            wait(200);
         }
-
         //COMPLETE SOLVE
-        return -1; //so it compiles
+        if (maze[row][col] == 'E'){ //if you're at the end
+          return numAts; //don't change its value; return # of @s
+        }
+        maze[row][col] = '@'; //if you're not at the end, put down an @
+        for (int[] move : moves){ //for all 4 moves
+          try{
+            int newR = row + move[0]; //make these new moves
+            int newC = col + move[1];
+            if (maze[newR][newC] == ' ' || maze[newR][newC] == 'E'){ //see if you can add to these spaces (so if everything around a move is a . or a @, u hit a state space dead end)
+              int toReturn = solve(newR, newC, numAts+1); //also bc it's try/catch, if this is an invalid space for loop will j continue
+              if (toReturn != -1){ //anyways set an int variable to the value of the solve from the next space
+                return toReturn; //if this int is greater than -1 (so it works), return the value
+              }
+            }
+          }
+          catch (IndexOutOfBoundsException e){
+            //don't do anything continue w for loop
+          }
+        }
+        maze[row][col] = '.'; //if the recursion returns -1, change the @ to .
+        return -1; //failed
     }
 
 }
