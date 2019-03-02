@@ -1,4 +1,5 @@
 import java.util.*;
+//nvm it is returning -1
 import java.io.*;
 public class Maze{
     private int[][] moves = {{-1, 0}, {1, 0}, {0, 1}, {0,-1}};
@@ -6,26 +7,16 @@ public class Maze{
     private boolean animate;//false by default
     //private int[][] startLocation; //i will set this in constructor, hope it's fine
     public static void main(String[] args){
-      try{
-        makeRandomMazeFile(args[0]);
-        Maze example = new Maze(args[0]);
-        System.out.println(example);
-      }catch (FileNotFoundException e){
-        System.out.println("file not found");
-      }catch (UnsupportedEncodingException e){
-        System.out.println("UTF-8 not there");
-      }
-      /*
-      try{
-        Maze example = new Maze(args[0]);
-        System.out.println(example);
-        example.setAnimate(Boolean.parseBoolean(args[1]));
-        System.out.println(example.solve());
+        try{
+          Maze example = new Maze(args[0]);
+          System.out.println(example);
+          example.setAnimate(Boolean.parseBoolean(args[1]));
+          System.out.println(example.solve());
 
-      }catch (FileNotFoundException e){
-        System.out.println("That file doesn't exist!");
-      }
-      */
+        }catch (FileNotFoundException e){
+          System.out.println("That file doesn't exist!");
+        }
+
     }
     /*Constructor loads a maze text file, and sets animate to false by default.
 
@@ -80,29 +71,33 @@ public class Maze{
           throw new IllegalStateException("Inappropriate amount of E and S!");
         }
     }
+    /*
     public static void makeRandomMazeFile(String filename) throws FileNotFoundException, UnsupportedEncodingException{ //throws a filenot found if the input filename can't be created, like if it's file.abcdefg
       //first make the Maze
+      Random rnd = new
+
       Random rnd = new Random();
       int rows = rnd.nextInt(30) + 5;
       int cols = rnd.nextInt(30) + 5; //want at least 5 rows
-      int ePosR = rnd.nextInt(rows); //row of e
-      int ePosC = rnd.nextInt(cols); //col
-      int sPosR = rnd.nextInt(rows);
-      if (sPosR == ePosR){
-        sPosR = (sPosR + sPosR/2) % rows;
-      }
-      int sPosC = rnd.nextInt(cols);
-      if (sPosC == ePosC){
-        sPosC = (sPosC + sPosC/2) % cols;
-      }
+      int ePosR = rnd.nextInt(rows-1) + 1; //row of e
+      int ePosC = rnd.nextInt(cols- 1) + 1; //col
+      int sPosR = rnd.nextInt(rows-1) + 1;
+      int sPosC = rnd.nextInt(cols-1) + 1;
       char[][] maze = new char[rows][cols];
-      for (int i = 0; i<maze.length; i++){
-        for (int k = 0; k<maze[0].length; k++){
-          maze[i][k] = '#';
+      for (int i = 0; i<maze.length; i++){ //filling left and right
+        for (int a = 0; a<maze[0].length; a++){
+          maze[i][a] = ' '; //fills whole board w space
         }
+        maze[i][0] = '#';
+        maze[i][cols - 1] = '#'; //then do #s
+      }
+      for (int k = 0; k<maze[0].length; k++){ //filling top and bottom
+        maze[0][k] = '#';
+        maze[rows - 1][k] = '#';
       }
       maze[ePosR][ePosC] = 'E';
       maze[sPosR][sPosC] = 'S';
+
       //then write out to a file specified by user
       PrintWriter writer = new PrintWriter(filename, "UTF-8");
       for (int r = 0; r<maze.length; r++){
@@ -112,7 +107,7 @@ public class Maze{
       writer.close();
 
     }
-
+    */
     private void wait(int millis){
          try {
              Thread.sleep(millis);
